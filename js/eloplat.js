@@ -31,6 +31,8 @@ function animStep(t){
 
 function gameStep(dt) {
   pc.step(dt);
+  lava.step(dt);
+  barrier.step(dt);
   lava.draw(ctx);
   barrier.draw(ctx);
   pc.draw(ctx);
@@ -110,7 +112,9 @@ function createLava(){
   var lava = new Sprite();
   lava.fillStyle = "rgba(255,0,0,0.7)";
   lava.strokeStyle = "rgba(200,0,0,0.7)";
-  lava.w = 50;
+  lava.step = function(dt){
+    this.w = 50*(1.5 - 1/(1+Math.exp(-1/100*(this.elo-pc.elo))));
+  }
   lava.h = 10;
   lava.x = 200;
   lava.y = 425;
@@ -118,14 +122,18 @@ function createLava(){
 }
 
 function createBarrier(){
-  var lava = new Sprite();
-  lava.fillStyle = "rgba(255,255,0,0.7)";
-  lava.strokeStyle = "rgba(200,200,0,0.7)";
-  lava.w = 10;
-  lava.h = 50;
-  lava.x = 400;
-  lava.y = 400;
-  return lava;
+  var barrier = new Sprite();
+  barrier.fillStyle = "rgba(255,255,0,0.7)";
+  barrier.strokeStyle = "rgba(200,200,0,0.7)";
+  barrier.w = 10;
+  barrier.h = 50;
+  barrier.x = 400;
+  barrier.y = 400;
+  barrier.step = function(dt){
+    this.h = 50*(1.5 - 1/(1+Math.exp(-1/100*(this.elo-pc.elo))));
+    this.y = 420-this.h/2;
+  }
+  return barrier;
 }
 
 function setupControls() {
