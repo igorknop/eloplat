@@ -6,6 +6,7 @@ var prev = 0;
 var pc;
 var lava;
 var barrier;
+var bonus;
 var enemy;
 var G = 600;
 function setup() {
@@ -16,6 +17,7 @@ function setup() {
   lava = createLava();
   barrier = createBarrier();
   enemy = createEnemy();
+  bonus = createBonus(250);
   setupControls();
   animID = requestAnimationFrame(animStep);
 }
@@ -39,6 +41,7 @@ function gameStep(dt) {
   lava.draw(ctx);
   barrier.draw(ctx);
   enemy.draw(ctx);
+  bonus.draw(ctx);
   pc.draw(ctx);
   if(pc.isCollidedWith(lava)){
     pc.x = 20;
@@ -58,6 +61,10 @@ function gameStep(dt) {
     pc.vy = 0;
     enemy.winsFrom(pc);
   }
+  if(pc.isCollidedWith(bonus)){
+    bonus.x += (bonus.x<500)?100:-400;
+    pc.winsFrom(bonus);
+  }
 
 }
 
@@ -69,7 +76,7 @@ function Sprite(){
   this.vx = 0;
   this.vy = 0;
   this.VX  = 100;
-  this.JY = 400;
+  this.JY = 300;
   this.fillStyle = "rgba(0,255,0,0.4)";
   this.strokeStyle = "rgba(0,255,0,1)";
   this.elo = 1500;
@@ -126,7 +133,7 @@ function createLava(){
     this.w = 50*(1.5 - 1/(1+Math.exp(-1/100*(this.elo-pc.elo))));
   }
   lava.h = 10;
-  lava.x = 200;
+  lava.x = 100;
   lava.y = 425;
   return lava;
 }
@@ -137,7 +144,7 @@ function createBarrier(){
   barrier.strokeStyle = "rgba(200,200,0,0.7)";
   barrier.w = 10;
   barrier.h = 50;
-  barrier.x = 400;
+  barrier.x = 300;
   barrier.y = 400;
   barrier.step = function(dt){
     this.h = 50*(1.5 - 1/(1+Math.exp(-1/100*(this.elo-pc.elo))));
@@ -147,8 +154,8 @@ function createBarrier(){
 }
 function createEnemy(){
   var enemy = new Sprite();
-  enemy.fillStyle = "rgba(0,0,255,0.4)";
-  enemy.strokeStyle = "rgba(0,0,200,0.4)";
+  enemy.fillStyle = "rgba(255,0,255,0.4)";
+  enemy.strokeStyle = "rgba(255,0,200,0.4)";
   enemy.w = 10;
   enemy.h = 10;
   enemy.x = 550;
@@ -160,6 +167,17 @@ function createEnemy(){
   return enemy;
 }
 
+function createBonus(x){
+  var bonus = new Sprite();
+  bonus.fillStyle = "rgba(255,255,0,0.4)";
+  bonus.strokeStyle = "rgba(255,255,255,1)";
+  bonus.w = 5;
+  bonus.h = 5;
+  bonus.x = x;
+  bonus.y = 415;
+  return bonus;
+}
+
 function setupControls() {
   addEventListener("keydown", function(e){
     switch (e.keyCode) {
@@ -167,7 +185,7 @@ function setupControls() {
         pc.vx = -pc.VX;
         break;
       case 38:
-        pc.vy += (Math.abs(pc.vy) < 0.1)? -pc.JY:0;
+        pc.vy += (Math.abs(pc.vy) < 0.1 && pc.y==420)? -pc.JY:0;
         break;
       case 39:
         pc.vx = +pc.VX;
