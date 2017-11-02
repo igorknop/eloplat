@@ -38,11 +38,13 @@ function gameStep(dt) {
     pc.x = 20;
     pc.y = 320;
     pc.vy = 0;
+    lava.winsFrom(pc);
   }
   if(pc.isCollidedWith(barrier)){
     pc.x = 20;
     pc.y = 320;
     pc.vy = 0;
+    barrier.winsFrom(pc);
   }
 
 }
@@ -58,6 +60,7 @@ function Sprite(){
   this.JY = 400;
   this.fillStyle = "rgba(0,255,0,0.4)";
   this.strokeStyle = "rgba(0,255,0,1)";
+  this.elo = 1500;
 }
 
 Sprite.prototype.step = function(dt){
@@ -77,7 +80,10 @@ Sprite.prototype.draw = function(ctx){
   ctx.translate(-this.w/2,-this.h/2);
   ctx.fillRect(this.x,this.y,this.w,this.h);
   ctx.strokeRect(this.x,this.y,this.w,this.h);
+  ctx.fillText(this.elo, 0, 0);
   ctx.restore();
+  ctx.fillStyle = "white";
+  ctx.fillText(this.elo,this.x-this.w/2,this.y-this.h);
 }
 
 Sprite.prototype.isCollidedWith = function(other){
@@ -87,6 +93,19 @@ Sprite.prototype.isCollidedWith = function(other){
   if(this.y+this.h/2 < other.y-other.h/2) return false;
   return true;
 }
+
+Sprite.prototype.winsFrom = function(other){
+  var K = 32;
+  var Rthis = Math.pow(10, this.elo/400);
+  var Rother = Math.pow(10, other.elo/400);
+  var Ethis = Rthis/(Rthis+Rother);
+  var Eother = Rother/(Rthis+Rother);
+  var Sthis = 1;
+  var Sother = 0;
+  this.elo = Math.round(this.elo+K*(Sthis-Ethis));
+  other.elo = Math.round(other.elo+K*(Sother-Eother));
+}
+
 function createLava(){
   var lava = new Sprite();
   lava.fillStyle = "rgba(255,0,0,0.7)";
