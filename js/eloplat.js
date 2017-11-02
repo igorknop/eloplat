@@ -34,6 +34,17 @@ function gameStep(dt) {
   lava.draw(ctx);
   barrier.draw(ctx);
   pc.draw(ctx);
+  if(pc.isCollidedWith(lava)){
+    pc.x = 20;
+    pc.y = 320;
+    pc.vy = 0;
+  }
+  if(pc.isCollidedWith(barrier)){
+    pc.x = 20;
+    pc.y = 320;
+    pc.vy = 0;
+  }
+
 }
 
 function Sprite(){
@@ -69,6 +80,13 @@ Sprite.prototype.draw = function(ctx){
   ctx.restore();
 }
 
+Sprite.prototype.isCollidedWith = function(other){
+  if(this.x-this.w/2 > other.x+other.w/2) return false;
+  if(this.x+this.w/2 < other.x-other.w/2) return false;
+  if(this.y-this.h/2 > other.y+other.h/2) return false;
+  if(this.y+this.h/2 < other.y-other.h/2) return false;
+  return true;
+}
 function createLava(){
   var lava = new Sprite();
   lava.fillStyle = "rgba(255,0,0,0.7)";
