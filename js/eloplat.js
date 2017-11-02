@@ -6,6 +6,7 @@ var prev = 0;
 var pc;
 var lava;
 var barrier;
+var enemy;
 var G = 600;
 function setup() {
   console.log("Setup...");
@@ -14,6 +15,7 @@ function setup() {
   pc = new Sprite();
   lava = createLava();
   barrier = createBarrier();
+  enemy = createEnemy();
   setupControls();
   animID = requestAnimationFrame(animStep);
 }
@@ -33,8 +35,10 @@ function gameStep(dt) {
   pc.step(dt);
   lava.step(dt);
   barrier.step(dt);
+  enemy.step(dt);
   lava.draw(ctx);
   barrier.draw(ctx);
+  enemy.draw(ctx);
   pc.draw(ctx);
   if(pc.isCollidedWith(lava)){
     pc.x = 20;
@@ -47,6 +51,12 @@ function gameStep(dt) {
     pc.y = 320;
     pc.vy = 0;
     barrier.winsFrom(pc);
+  }
+  if(pc.isCollidedWith(enemy)){
+    pc.x = 20;
+    pc.y = 320;
+    pc.vy = 0;
+    enemy.winsFrom(pc);
   }
 
 }
@@ -134,6 +144,20 @@ function createBarrier(){
     this.y = 420-this.h/2;
   }
   return barrier;
+}
+function createEnemy(){
+  var enemy = new Sprite();
+  enemy.fillStyle = "rgba(0,0,255,0.4)";
+  enemy.strokeStyle = "rgba(0,0,200,0.4)";
+  enemy.w = 10;
+  enemy.h = 10;
+  enemy.x = 550;
+  enemy.y = 420;
+  enemy.step = function(dt){
+    this.vx += 2*(1.5 - 1/(1+Math.exp(-1/100*(this.elo-pc.elo))))*(500-this.x)*dt;
+    this.x +=this.vx*dt;
+  }
+  return enemy;
 }
 
 function setupControls() {
